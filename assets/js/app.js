@@ -12,7 +12,7 @@
     pred: '<path d="M3 17l5-5 4 3 7-8M15 7h4v4"/>', fin: '<path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', mnt: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/>',
     rep: '<path d="M6 2h9l5 5v15H6zM14 2v6h6M9 13h8M9 17h8"/>', adm: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>', bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 21h4"/>',
     play: '<path d="M7 5v14l11-7z"/>', pause: '<path d="M8 5v14M16 5v14"/>', next: '<path d="M5 5v14l9-7zM18 5v14"/>', reset: '<path d="M4 4v6h6M4.5 15a8 8 0 1 0 1.9-8.3L4 10"/>', more: '<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',
-    focus: '<circle cx="12" cy="12" r="3"/><path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/>', home: '<path d="M3 11 12 3l9 8M5 9v12h14V9"/>', plus: '<path d="M12 5v14M5 12h14"/>', minus: '<path d="M5 12h14"/>', dl: '<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
+    focus: '<circle cx="12" cy="12" r="3"/><path d="M3 8V3h5M16 3h5v5M21 16v5h-5M8 21H3v-5"/>', home: '<path d="M3 11 12 3l9 8M5 9v12h14V9"/>', plus: '<path d="M12 5v14M5 12h14"/>', minus: '<path d="M5 12h14"/>', expand: '<path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>', shrink: '<path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/>', dl: '<path d="M12 3v12M7 10l5 5 5-5M4 21h16"/>',
   };
   const ico = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + I[k] + '</svg>';
   const SEV = { crit: ['Critique', 's-crit'], warn: ['Avertissement', 's-warn'], info: ['Information', 's-info'] };
@@ -51,7 +51,9 @@
     $('#navlist').innerHTML = VIEWS.map((v) => '<li><a href="#' + v.id + '" data-v="' + v.id + '">' + ico(v.ic) + '<span>' + v.name + '</span></a></li>').join('');
     $('#bnav').innerHTML = [['command', 'Centre', 'cmd'], ['live', 'Flotte', 'live'], ['ai', 'IA', 'ai'], ['finance', 'Finances', 'fin'], ['more', 'Plus', 'more']].map(([id, n, i]) => '<button data-v="' + id + '">' + ico(i) + n + '</button>').join('');
     $('#bnav').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.v === 'more') menu(true); else go(b.dataset.v); });
-    $('#menuBtn').addEventListener('click', () => menu(!$('#nav').classList.contains('open'))); $('#nav').addEventListener('click', (e) => { if (e.target.closest('a')) menu(false); });
+    $('#menuBtn').addEventListener('click', () => (mobile() ? menu(!$('#nav').classList.contains('open')) : navMin(!$('#app').classList.contains('navmin'))));
+    navMin(pref('fi.navmin') !== '0');
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && st.maxi && !document.querySelector('dialog[open]')) maxi(false); }); $('#nav').addEventListener('click', (e) => { if (e.target.closest('a')) menu(false); });
     $('#roleSel').innerHTML = Object.keys(ROLES).map((k) => '<option value="' + k + '">' + ROLES[k][0] + '</option>').join('');
     $('#roleSel').addEventListener('change', (e) => { st.role = e.target.value; navRole(); journal('Vous', 'Vue simulée : ' + ROLES[st.role][0]); if (!ROLES[st.role][1].includes(st.view)) go('command'); else render(); toast('Affichage simulé pour : ' + ROLES[st.role][0]); });
     const si = $('#searchIn');
@@ -67,9 +69,13 @@
   }
   function regie() { $('#scn').value = st.scn; $('#rgPlay').innerHTML = ico(st.paused ? 'play' : 'pause') + '<span>' + (st.paused ? 'Reprendre' : 'Pause') + '</span>'; $$('[data-sp]').forEach((b) => b.setAttribute('aria-pressed', +b.dataset.sp === st.speed)); $('#rgDesc').textContent = SCEN.find((x) => x[0] === st.scn)[2]; }
   function navRole() { const ok = ROLES[st.role][1]; $$('#navlist li').forEach((li) => (li.hidden = !ok.includes(li.firstChild.dataset.v))); $$('#bnav button').forEach((b) => (b.hidden = b.dataset.v !== 'more' && !ok.includes(b.dataset.v))); }
-  const menu = (o) => { $('#nav').classList.toggle('open', o); $('#menuBtn').setAttribute('aria-expanded', o); };
+  const mobile = () => matchMedia('(max-width:760px)').matches;
+  const pref = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } };
+  function navMin(o) { $('#app').classList.toggle('navmin', o); pref('fi.navmin', o ? '1' : '0'); $('#menuBtn').setAttribute('aria-expanded', String(!o)); $('#menuBtn').setAttribute('aria-label', o ? 'Afficher le menu' : 'Réduire le menu'); if (gl) requestAnimationFrame(() => F.resize()); }
+  const menu = (o) => { if (!mobile()) return; $('#nav').classList.toggle('open', o); $('#menuBtn').setAttribute('aria-expanded', o); };
+  function maxi(o) { st.maxi = o; const s = $('.twin-slot'); const h = s && s.closest('.hero,.twin-page'); if (h) h.classList.toggle('maxi', o); document.body.classList.toggle('has-maxi', o); $$('[data-tw="max"]').forEach((b) => { b.setAttribute('aria-pressed', String(o)); b.innerHTML = ico(o ? 'shrink' : 'expand') + (o ? 'Réduire' : 'Agrandir'); }); if (gl) requestAnimationFrame(() => F.resize()); }
   function go(id) { if (location.hash.slice(1) === id) route(); else location.hash = id; }
-  function route() { let id = location.hash.slice(1); if (!VIEWS.some((v) => v.id === id)) id = 'command'; if (!ROLES[st.role][1].includes(id)) { toast('Ce module n’est pas accessible au rôle « ' + ROLES[st.role][0] + ' » (simulation).', 'warn'); id = 'command'; } st.view = id;
+  function route() { let id = location.hash.slice(1); if (!VIEWS.some((v) => v.id === id)) id = 'command'; if (!ROLES[st.role][1].includes(id)) { toast('Ce module n’est pas accessible au rôle « ' + ROLES[st.role][0] + ' » (simulation).', 'warn'); id = 'command'; } if (st.maxi && id !== st.view) maxi(false); st.view = id;
     $$('#navlist a').forEach((a) => (a.dataset.v === id ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'))); $$('#bnav button').forEach((a) => (a.dataset.v === id ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'))); render(); $('#main').scrollTop = 0; }
   function crumb() { const v = VIEWS.find((x) => x.id === st.view); $('#crumb').innerHTML = '<b>' + v.name + '</b>' + (st.sel && (st.view === 'command' || st.view === 'live') ? '<span class="m">/</span><span>' + esc(selName(st.sel)) + '</span>' : ''); }
   const selName = (id) => (id.startsWith('veh:') ? id.slice(4) : id.startsWith('zone:') ? id.slice(5) + ' (zone)' : 'Dépôt');
@@ -159,12 +165,13 @@
   const V = {};
   function render() { crumb(); C.hideTip(); (V[st.view] || V.command)($('#view')); if (gl) F.update(sceneState()); }
   function twin(id) {
-    return '<div class="twin-slot" id="' + id + '"><div class="twin-ctl"><button class="btn" data-tw="reset">' + ico('home') + 'Recentrer</button><button class="btn" data-tw="focus">' + ico('focus') + 'Centrer la sélection</button><button class="btn" data-tw="in" aria-label="Zoomer">' + ico('plus') + '</button><button class="btn" data-tw="out" aria-label="Dézoomer">' + ico('minus') + '</button></div>' +
+    return '<div class="twin-slot" id="' + id + '"><div class="twin-ctl"><button class="btn" data-tw="reset">' + ico('home') + 'Recentrer</button><button class="btn" data-tw="focus">' + ico('focus') + 'Centrer la sélection</button><button class="btn" data-tw="in" aria-label="Zoomer">' + ico('plus') + '</button><button class="btn" data-tw="out" aria-label="Dézoomer">' + ico('minus') + '</button><button class="btn" data-tw="max" aria-pressed="false">' + ico('expand') + 'Agrandir</button></div><div class="twin-hint">Glisser : se déplacer · Clic droit ou Ctrl + glisser : pivoter · Molette ou pincer : zoom</div>' +
       '<div class="daypill" data-day></div><div class="cab" id="cab" aria-live="polite"></div><div class="hq" id="hq"></div><div class="twin-legend">' + Object.keys(STL).map((k) => '<span><i style="background:' + SCOL[k] + '"></i>' + STL[k] + '</span>').join('') + '<span><i style="background:#ffd23f;border-radius:0;height:3px;width:14px"></i>Itinéraire sélectionné</span><span class="m">Plan schématique, positions simulées</span></div></div>';
   }
   function mountTwin(id) {
     const slot = $('#' + id); if (!slot) return;
-    $$('[data-tw]', slot).forEach((b) => b.addEventListener('click', () => { const a = b.dataset.tw; if (a === 'reset') F.reset(); else if (a === 'focus') { if (!F.focus(st.sel)) toast('Sélectionnez un véhicule visible ou une zone.'); } else F.zoom(a === 'in' ? 0.7 : 1.4); }));
+    $$('[data-tw]', slot).forEach((b) => b.addEventListener('click', () => { const a = b.dataset.tw; if (a === 'max') return maxi(!st.maxi); if (!gl) return; if (a === 'reset') F.reset(); else if (a === 'focus') { if (!F.focus(st.sel)) toast('Sélectionnez un véhicule visible ou une zone.'); } else F.zoom(a === 'in' ? 0.7 : 1.4); }));
+    if (st.maxi) maxi(true);
     if (gl) { if (F.inCab() || F.inHQ()) slot.classList.add('cabfull'); F.attach(slot); F.select(st.sel); if (F.inCab()) cabHud(true); if (F.inHQ()) hqHud(true); } else slot.insertAdjacentHTML('beforeend', '<div class="nogl">WebGL indisponible : utilisez le plan schématique de « Flotte en direct ».</div>');
   }
   function statChips() { return '<div class="chipf" role="group" aria-label="Statut">' + [['all', 'Tous les statuts']].concat(Object.keys(STL).map((k) => [k, STL[k]])).map(([k, l]) => '<button data-st="' + k + '" aria-pressed="' + (st.stat === k) + '">' + (k !== 'all' ? '<i style="background:' + SCOL[k] + '"></i>' : '') + l + '</button>').join('') + '</div>'; }

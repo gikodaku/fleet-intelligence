@@ -6,6 +6,12 @@ Maquette interactive d’une tour de contrôle pour flottes de véhicules à Abi
 
 ![Centre de commande en 3D](docs/captures/hero_city.jpg)
 
+## Prise en main
+
+- **FI** (en haut à gauche) ramène au centre de commande ; le bouton ☰ affiche ou réduit le menu des onglets (le choix est mémorisé).
+- **Carte 3D** : glisser pour se déplacer, clic droit ou Ctrl + glisser pour pivoter, molette ou pincer pour zoomer.
+- **Agrandir** passe la carte en plein écran en gardant les indicateurs à droite ; Échap pour revenir.
+
 ## Ce que montre la maquette
 
 | Écran | Ce qu’on y voit |

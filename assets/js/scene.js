@@ -297,6 +297,10 @@
     const dl = document.createElement('button'); dl.className = 'lbl dep'; dl.type = 'button'; dl.innerHTML = '<span>Plateforme logistique</span>'; dl.addEventListener('click', () => opts.onPick('depot')); fo.labels.appendChild(dl); lbls.__depot = dl;
     fo.vl = document.createElement('div'); fo.vl.className = 'lbl vsel'; fo.vl.style.display = 'none'; fo.labels.appendChild(fo.vl);
     fo.ctl.target.set(0, 4, -12); fo.c.position.copy(fo.home()); fo.ctl.minDistance = 18; fo.ctl.maxDistance = 520;
+    // Navigation façon carte : glisser = se déplacer, clic droit (ou Ctrl + glisser) = pivoter, molette = zoom ; tactile : 1 doigt déplace, 2 doigts zoom et pivot
+    fo.ctl.screenSpacePanning = false; fo.ctl.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE }; fo.ctl.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
+    fo.ctl.zoomSpeed = 1.2; fo.ctl.panSpeed = 1.1;
+    { const lim = 4.2 * st, off = new THREE.Vector3(); fo.ctl.addEventListener('change', () => { const t = fo.ctl.target, x = Math.max(-lim, Math.min(lim, t.x)), z = Math.max(-lim, Math.min(lim, t.z)); if (x !== t.x || z !== t.z) { off.set(x - t.x, 0, z - t.z); t.add(off); fo.c.position.add(off); } }); }
     fo.ctl.addEventListener('start', () => { if (follow) { follow = null; if (opts.onFollowEnd) opts.onFollowEnd(); } });
     picker(fo, opts.onPick, opts.onHover); attachTo(fo, host); F.setTime(17 * 60); loopF();
   };
