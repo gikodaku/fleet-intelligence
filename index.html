@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fleet Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<div class="app" id="app">
+  <div class="demo" role="note"><b>DÉMONSTRATION — DONNÉES SIMULÉES</b><span>Véhicules, chauffeurs, clients et montants fictifs. Aucune API Yango, GPS ou IA connectée.</span></div>
+  <nav class="nav" id="nav" aria-label="Navigation principale">
+    <div class="brand">
+      <div class="name"><i></i>FLEET INTELLIGENCE</div>
+      <div class="sub">Mobilité et logistique, Abidjan</div>
+    </div>
+    <ol id="navlist"></ol>
+    <div class="foot">Plateforme de démonstration.</div>
+  </nav>
+  <header class="top">
+    <button class="menu-btn" id="menuBtn" aria-label="Ouvrir le menu" aria-controls="nav" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="crumb" id="crumb"></div>
+    <div class="search" role="search"><label class="sr" for="searchIn">Rechercher</label><input id="searchIn" autocomplete="off" placeholder="Rechercher un véhicule, un chauffeur, une mission"><div class="drop" id="searchDrop" hidden></div></div>
+    <div class="role"><label class="sr" for="roleSel">Voir comme</label><select id="roleSel" title="Voir comme (simulation)"></select></div>
+    <div class="notif"><button class="bell" id="bellBtn" aria-label="Notifications" aria-expanded="false" aria-controls="notifDrop"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 21h4"/></svg><span class="badge" id="bellBadge" hidden></span></button><div class="drop" id="notifDrop" hidden></div></div>
+    <div class="clock" id="clock" aria-live="off">07:00</div>
+  </header>
+  <main id="main"><div id="view"></div></main>
+  <div class="regie" id="regie" aria-label="Régie de simulation"></div>
+  <nav class="bnav" id="bnav" aria-label="Navigation mobile"></nav>
+</div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div class="hovertip" id="hovertip" role="tooltip"></div>
+<dialog id="dlg"></dialog>
+<script src="assets/vendor/three/three.min.js"></script>
+<script src="assets/vendor/three/OrbitControls.js"></script>
+<script src="assets/js/engine.js"></script>
+<script src="assets/js/charts.js"></script>
+<script src="assets/js/scene.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
